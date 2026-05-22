@@ -1,69 +1,83 @@
 import { useNavigate } from 'react-router-dom'
+import { exportarModelo, cargarModelo } from '../utils/modeloLetras'
+
 
 export default function Home() {
-    const navigate = useNavigate()
+  const navigate = useNavigate()
+  async function descargarModelo() {
+  const ok = await cargarModelo()
+  if (ok) {
+    await exportarModelo()
+  } else {
+    alert('No hay modelo guardado, debes entrenar primero')
+  }
+}
   return (
-    <div className="min-h-screen bg-purple-50 flex flex-col items-center justify-center p-6">
-      
-      <div className="mb-8 text-center">
-        <div className="w-20 h-20 bg-purple-600 rounded-2xl flex items-center justify-center mx-auto mb-4">
-          <span className="text-4xl">🤟</span>
-        </div>
-        <h1 className="text-3xl font-bold text-purple-700">SignosApp</h1>
-        <p className="text-purple-400 mt-1">Aprende a leer y escribir</p>
-      </div>
-
-      <div className="w-full max-w-sm bg-white rounded-2xl border border-purple-100 p-5 mb-4">
-        <div className="flex items-center gap-3 mb-4">
-          <div className="w-10 h-10 bg-purple-100 rounded-full flex items-center justify-center font-bold text-purple-700">S</div>
-          <div>
-            <p className="font-medium text-gray-800">Hola, Sofía</p>
-            <p className="text-xs text-gray-400">Nivel 2 · 340 puntos</p>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#FFF7ED,#F3E8FF_55%,#EDE9FE)] px-6 py-10">
+      <div className="max-w-3xl mx-auto">
+        <div className="flex flex-col items-center text-center mb-10 animate-fade-up">
+          <div className="relative">
+            <div className="w-24 h-24 bg-purple-600 rounded-[28px] flex items-center justify-center shadow-lg">
+              <span className="text-4xl">🤟</span>
+            </div>
+            <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-300 rounded-full animate-bounce"></div>
           </div>
-          <span className="ml-auto text-xs bg-amber-100 text-amber-700 px-2 py-1 rounded-full">🔥 5 días</span>
+          <h1 className="text-4xl sm:text-5xl font-extrabold text-purple-700 mt-5">SignosApp</h1>
+          <p className="text-purple-600 mt-2 text-base sm:text-lg">
+            Un lugar divertido para aprender lenguaje de señas
+          </p>
+          <span className="mt-3 text-xs sm:text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
+            Para ninos de 5 a 15 anos
+          </span>
         </div>
-        <p className="text-sm text-gray-500 mb-2">Alfabeto · Letra M</p>
-        <div className="w-full bg-purple-100 rounded-full h-2 mb-1">
-          <div className="bg-purple-500 h-2 rounded-full" style={{width: '58%'}}></div>
-        </div>
-        <p className="text-xs text-gray-400 mb-4">14 de 24 letras completadas</p>
-        <button
-             onClick={() => navigate('/modulo')}
-             className="w-full bg-purple-600 text-white py-3 rounded-xl font-medium text-sm"
-        >
-            ▶ Continuar
-        </button>
-      </div>
 
-      <div className="w-full max-w-sm grid grid-cols-2 gap-3">
-        <div className="bg-white rounded-2xl border border-purple-100 p-4 text-center">
-          <p className="text-2xl mb-1">🔤</p>
-          <p className="font-medium text-gray-800 text-sm">Alfabeto</p>
-          <p className="text-xs text-gray-400">A – Z con señas</p>
-          <div className="w-full bg-purple-100 rounded-full h-1.5 mt-2">
-            <div className="bg-purple-500 h-1.5 rounded-full" style={{width: '58%'}}></div>
+        <div className="grid gap-5 sm:grid-cols-2">
+          <div className="bg-white border border-purple-200 rounded-3xl p-6 shadow-sm animate-fade-up">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
+                <span className="text-2xl">🔤</span>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-800">Aprender letras</p>
+                <p className="text-sm text-gray-500">Reconoce el abecedario A-Z</p>
+              </div>
+            </div>
+            <button
+              onClick={() => navigate('/modulo')}
+              className="mt-5 w-full bg-purple-600 text-white py-3 rounded-2xl font-semibold text-sm transition-transform hover:-translate-y-0.5"
+            >
+              Empezar
+            </button>
+          </div>
+
+          <div className="bg-white border border-gray-200 rounded-3xl p-6 opacity-70 animate-fade-up-delay">
+            <div className="flex items-center gap-4">
+              <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center">
+                <span className="text-2xl">🔢</span>
+              </div>
+              <div>
+                <p className="text-lg font-bold text-gray-800">Aprender numeros</p>
+                <p className="text-sm text-gray-500">Aprende los numeros del 1 al 10</p>
+              </div>
+            </div>
+            <div className="mt-5 text-xs text-amber-700 bg-amber-100 px-3 py-2 rounded-xl text-center">
+              <button onClick={() => navigate('/modulo-numeros')}>
+                Empieza Aqui
+              </button>
+            </div>
           </div>
         </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center opacity-50">
-          <p className="text-2xl mb-1">📝</p>
-          <p className="font-medium text-gray-800 text-sm">Sílabas</p>
-          <p className="text-xs text-gray-400">Combina letras</p>
-          <span className="text-xs bg-teal-100 text-teal-700 px-2 py-0.5 rounded-full mt-2 inline-block">Próximo</span>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center opacity-50">
-          <p className="text-2xl mb-1">💬</p>
-          <p className="font-medium text-gray-800 text-sm">Palabras</p>
-          <p className="text-xs text-gray-400">Vocabulario básico</p>
-          <span className="text-xs bg-amber-100 text-amber-700 px-2 py-0.5 rounded-full mt-2 inline-block">Bloqueado</span>
-        </div>
-        <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center opacity-50">
-          <p className="text-2xl mb-1">🗣️</p>
-          <p className="font-medium text-gray-800 text-sm">Frases</p>
-          <p className="text-xs text-gray-400">Comunicación</p>
-          <span className="text-xs bg-orange-100 text-orange-700 px-2 py-0.5 rounded-full mt-2 inline-block">Bloqueado</span>
+
+        <div className="mt-8 bg-white/70 border border-white rounded-3xl p-5 text-center animate-fade-up-delay">
+          <p className="text-sm text-gray-600">Aprende jugando, paso a paso, con retos cortos y faciles.</p>
         </div>
       </div>
-
+      <button
+        onClick={descargarModelo}
+        className="w-full max-w-sm mt-4 bg-teal-600 text-white py-3 rounded-xl font-medium text-sm"
+      >
+        ⬇️ Exportar modelo entrenado
+      </button>
     </div>
   )
 }

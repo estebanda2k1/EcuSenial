@@ -6,19 +6,22 @@ export default function useMediaPipe(videoRef, onResultado) {
   const [cargando, setCargando] = useState(false)
   const [activo, setActivo] = useState(false)
 
-  async function iniciar() {
-    if (!videoRef.current) return
-    setCargando(true)
-
-    // Cargar MediaPipe desde CDN via script tag
-    await new Promise((resolve) => {
-      if (window.Hands) return resolve()
+  async function cargarMediaPipe() {
+    return new Promise((resolve) => {
+      if (window.Hands) { resolve(); return }
       const script = document.createElement('script')
       script.src = 'https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js'
       script.crossOrigin = 'anonymous'
       script.onload = resolve
       document.head.appendChild(script)
     })
+  }
+
+  async function iniciar() {
+    if (!videoRef.current) return
+    setCargando(true)
+
+    await cargarMediaPipe()
 
     const hands = new window.Hands({
       locateFile: (file) =>
@@ -40,32 +43,25 @@ export default function useMediaPipe(videoRef, onResultado) {
       }
     })
 
+    await hands.initialize()
     handsRef.current = hands
-
-    async function loop() {
-      try {
-        if (
-          videoRef.current &&
-          videoRef.current.readyState >= 2 &&
-          !videoRef.current.paused &&
-          videoRef.current.videoWidth > 0
-        ) {
-          await hands.send({ image: videoRef.current })
-        }
-      } catch (e) {
-        console.warn('MediaPipe error:', e)
-      }
-      animFrameRef.current = requestAnimationFrame(loop)
-    }
-
-    loop()
     setCargando(false)
     setActivo(true)
+
+    async function detectar() {
+      if (handsRef.current && videoRef.current && videoRef.current.readyState >= 2) {
+        await handsRef.current.send({ image: videoRef.current })
+      }
+      animFrameRef.current = requestAnimationFrame(detectar)
+    }
+
+    detectar()
   }
 
   function detener() {
     if (animFrameRef.current) cancelAnimationFrame(animFrameRef.current)
     if (handsRef.current) handsRef.current.close()
+    handsRef.current = null
     setActivo(false)
   }
 
@@ -74,4 +70,4 @@ export default function useMediaPipe(videoRef, onResultado) {
   }, [])
 
   return { iniciar, detener, cargando, activo }
-}
+} 
