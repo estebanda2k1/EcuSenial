@@ -14,7 +14,7 @@ const LETRAS = [
   'A','B','C','D','E','F','G','I','K','L','M','N','O','R','S','T','U','V','W','Y',
   '1','2','3','4','5','6','7','8','9','10'
 ]
-const MUESTRAS_POR_LETRA = 30
+const MUESTRAS_POR_LETRA = 40
 
 export default function Entrenar() {
   const videoRef = useRef(null)

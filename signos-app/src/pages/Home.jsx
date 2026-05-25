@@ -78,6 +78,25 @@ export default function Home() {
       >
         ⬇️ Exportar modelo entrenado
       </button>
+      <div className="bg-white border border-purple-200 rounded-3xl p-6 shadow-sm col-span-2">
+        <div className="flex items-center gap-4">
+          <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center">
+            <span className="text-2xl">🎯</span>
+          </div>
+          <div>
+            <p className="text-lg font-bold text-gray-800">Modo desafío</p>
+            <p className="text-sm text-gray-500">Señas al azar — pon a prueba lo que aprendiste</p>
+          </div>
+        </div>
+        <button
+          onClick={() => navigate('/desafio')}
+          className="mt-5 w-full bg-red-500 text-white py-3 rounded-2xl font-semibold text-sm"
+        >
+          🎯 Jugar
+        </button>
+      </div>
     </div>
+
+    
   )
 }

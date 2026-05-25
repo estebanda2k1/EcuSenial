@@ -3,6 +3,7 @@ import Home from './pages/Home'
 import Modulo from './pages/Modulo'
 import Camara from './pages/Camara'
 import Entrenar from './pages/Entrenar'
+import Desafio from './pages/Desafio'
 
 export default function App() {
   return (
@@ -14,6 +15,7 @@ export default function App() {
         <Route path="/camara" element={<Camara />} />
         <Route path="/camara-numeros" element={<Camara modo="numeros" />} />
         <Route path="/entrenar" element={<Entrenar />} />
+        <Route path="/desafio" element={<Desafio />} />
       </Routes>
     </BrowserRouter>
   )
