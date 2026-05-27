@@ -19,18 +19,23 @@ export default function Modulo({ modo = 'letras' }) {
         { letra: 'G', descripcion: 'Índice apunta al lado', hecho: false },
         { letra: 'H', descripcion: 'Índice y medio apuntan al lado', hecho: false },
         { letra: 'I', descripcion: 'Meñique extendido hacia arriba', hecho: false },
+        { letra: 'J', descripcion: 'Meñique dibuja una J en el aire', hecho: false },
         { letra: 'K', descripcion: 'Índice y medio en V arriba', hecho: false },
         { letra: 'L', descripcion: 'Índice y pulgar forman una L', hecho: false },
         { letra: 'M', descripcion: 'Tres dedos sobre el pulgar', hecho: false },
         { letra: 'N', descripcion: 'Dos dedos sobre el pulgar', hecho: false },
         { letra: 'O', descripcion: 'Dedos forman un círculo', hecho: false },
+        { letra: 'P', descripcion: 'Índice apunta abajo, pulgar al medio', hecho: false },
+        { letra: 'Q', descripcion: 'Índice y pulgar apuntan abajo', hecho: false },
         { letra: 'R', descripcion: 'Dedos cruzados', hecho: false },
         { letra: 'S', descripcion: 'Puño cerrado', hecho: false },
         { letra: 'T', descripcion: 'Pulgar entre índice y medio', hecho: false },
         { letra: 'U', descripcion: 'Índice y medio juntos arriba', hecho: false },
         { letra: 'V', descripcion: 'Índice y medio separados arriba', hecho: false },
         { letra: 'W', descripcion: 'Tres dedos arriba separados', hecho: false },
+        { letra: 'X', descripcion: 'Índice en forma de gancho', hecho: false },
         { letra: 'Y', descripcion: 'Pulgar y meñique extendidos', hecho: false },
+        { letra: 'Z', descripcion: 'Índice dibuja una Z', hecho: false }
       ]
 
   const [seleccionada, setSeleccionada] = useState(items[0])

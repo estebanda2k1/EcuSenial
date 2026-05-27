@@ -82,6 +82,10 @@ export function detectarLetra(landmarks) {
   // I — solo meñique arriba
   if (!iExt && !mExt && !aExt && nExt) return 'I'
 
+  // J — meñique dibuja J (aqui detectamos posicion inicial meñique arriba)
+  // Nota: J es dinámica, pero estáticamente se parece a I, a veces con movimiento o pulgar suelto
+  if (!iExt && !mExt && !aExt && nExt && P.x > I0.x) return 'J'
+
   // K — índice arriba, medio semi-arriba, pulgar entre ellos
   if (iExt && mExt && !aExt && !nExt && P.y < M.y && P.y > I.y) return 'K'
 
@@ -126,6 +130,9 @@ export function detectarLetra(landmarks) {
 
   // Y — pulgar y meñique extendidos
   if (!iExt && !mExt && !aExt && nExt && pExt) return 'Y'
+
+  // Z — indice solo, movimiento dibujando Z (estaticamente detectamos el indice)
+  if (iExt && !mExt && !aExt && !nExt && cerca(P, M, 0.08) && !pExt) return 'Z'
 
   return null
 }

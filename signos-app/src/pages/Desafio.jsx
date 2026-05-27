@@ -4,7 +4,7 @@ import useMediaPipe from '../hooks/useMediaPipe'
 import { predecir, cargarModelo } from '../utils/modeloLetras'
 import { detectarLetra } from '../utils/detectarLetra'
 
-const TODAS = ['A','B','C','D','E','F','G','I','K','L','M','N','O','R','S','T','U','V','W','Y','1','2','3','4','5','6','7','8','9','10']
+const TODAS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','10']
 
 function letraAleatoria(excluir = null) {
   let nueva

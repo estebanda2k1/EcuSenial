@@ -14,7 +14,7 @@ export default function Camara({ modo = 'letras' }) {
   const esNumeros = modo === 'numeros'
   const LETRAS = esNumeros
     ? ['1','2','3','4','5','6','7','8','9','10']
-    : ['A','B','C','D','E','F','G','I','K','L','M','N','O','R','S','T','U','V','W','Y']
+    : ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z']
 
   const letraInicial = location.state?.letra || LETRAS[0]
   const modoLibre = location.state?.libre || false
@@ -103,7 +103,7 @@ export default function Camara({ modo = 'letras' }) {
     if (!landmarks || bloqueadoRef.current || pantallaRef.current !== 'practica') return
     dibujarPuntos(landmarks)
 
-    const TODAS = ['A','B','C','D','E','F','G','I','K','L','M','N','O','R','S','T','U','V','W','Y','1','2','3','4','5','6','7','8','9','10']
+    const TODAS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','10']
     let detectada = null
     if (modeloCargadoRef.current) {
       detectada = await predecir(landmarks, TODAS)
