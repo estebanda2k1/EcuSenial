@@ -28,7 +28,6 @@ export default function Camara({ modo = 'letras' }) {
   const [mensaje, setMensaje] = useState(null)
   const [animacion, setAnimacion] = useState(null)
   const [letraDetectada, setLetraDetectada] = useState(null)
-  const [modeloCargado, setModeloCargado] = useState(false)
   const [indiceLetra, setIndiceLetra] = useState(indiceInicial)
   const [pantalla, setPantalla] = useState('practica')
   const [bloqueado, setBloqueado] = useState(false)
@@ -46,8 +45,8 @@ export default function Camara({ modo = 'letras' }) {
   const mensajesAnimo = ['¡Casi! 💪', '¡Tú puedes! 🤗', '¡Sigue! 😊', '¡Un poco más! 🌈']
 
   useEffect(() => {
-    cargarModelo().then(ok => {
-      setModeloCargado(ok)
+    const tipo = esNumeros ? 'numeros' : 'letras'
+    cargarModelo(tipo).then(ok => {
       modeloCargadoRef.current = ok
     })
   }, [])
@@ -103,10 +102,9 @@ export default function Camara({ modo = 'letras' }) {
     if (!landmarks || bloqueadoRef.current || pantallaRef.current !== 'practica') return
     dibujarPuntos(landmarks)
 
-    const TODAS = ['A','B','C','D','E','F','G','H','I','J','K','L','M','N','O','P','Q','R','S','T','U','V','W','X','Y','Z','1','2','3','4','5','6','7','8','9','10']
     let detectada = null
     if (modeloCargadoRef.current) {
-      detectada = await predecir(landmarks, TODAS)
+      detectada = await predecir(landmarks, LETRAS, esNumeros ? 'numeros' : 'letras')
     } else {
       detectada = detectarLetra(landmarks)
     }
@@ -247,57 +245,70 @@ export default function Camara({ modo = 'letras' }) {
         pointerEvents: pantalla === 'practica' ? 'auto' : 'none',
         zIndex: pantalla === 'practica' ? 0 : -1
       }}>
-        <div className="p-4">
-          <div className="flex items-center justify-between mb-3">
-            <button onClick={volverAtras} className="text-purple-600 font-medium text-sm">
+        <div className="p-4 max-w-sm mx-auto">
+
+          {/* Header */}
+          <div className="flex items-center justify-between mb-4">
+            <button
+              onClick={volverAtras}
+              className="flex items-center gap-1 text-purple-600 font-bold text-base active:scale-95 transition-transform"
+            >
               ← {esNumeros ? 'Números' : 'Módulo'}
             </button>
-            <span className="text-xs font-medium text-purple-500 bg-purple-100 px-3 py-1 rounded-full">
+            <span className="text-sm font-bold text-purple-600 bg-purple-100 px-4 py-1.5 rounded-full">
               {modoLibre ? '🆓 Modo libre' : `${indiceLetra + 1} / ${LETRAS.length}`}
             </span>
           </div>
 
+          {/* Barra de progreso */}
           {!modoLibre && (
-            <div className="w-full bg-purple-100 rounded-full h-2 mb-4">
+            <div className="w-full bg-purple-100 rounded-full h-3 mb-4">
               <div
-                className="bg-purple-500 h-2 rounded-full transition-all"
+                className="bg-purple-500 h-3 rounded-full transition-all"
                 style={{ width: `${(indiceLetra / LETRAS.length) * 100}%` }}
               />
             </div>
           )}
 
-          <div className={`rounded-3xl p-6 mb-4 text-center transition-all ${
+          {/* Tarjeta de la letra objetivo */}
+          <div className={`rounded-3xl px-6 py-7 mb-4 text-center transition-all shadow-lg ${
             animacion === 'exito' ? 'bg-teal-500' : 'bg-purple-600'
           }`}>
-            <p className="text-sm text-purple-200 mb-1">
+            <p className="text-base text-purple-200 mb-1 font-semibold">
               {modoLibre ? 'Practica esta seña' : 'Haz esta seña'}
             </p>
-            <p className="text-8xl font-extrabold text-white leading-none">{letra}</p>
-            <p className="text-purple-200 text-sm mt-2">
+            <p
+              className="font-extrabold text-white leading-none"
+              style={{ fontSize: '7.5rem' }}
+            >
+              {letra}
+            </p>
+            <p className="text-purple-200 text-sm mt-2 font-medium">
               {esNumeros ? `Número ${letra}` : `Letra ${letra}`}
             </p>
             {contadorSegundos && (
-              <div className="mt-3 flex items-center justify-center gap-2">
-                <div className="w-full bg-white bg-opacity-30 rounded-full h-2 max-w-xs">
+              <div className="mt-4 flex items-center justify-center gap-3">
+                <div className="w-full bg-white bg-opacity-30 rounded-full h-3 max-w-xs">
                   <div
-                    className="bg-white h-2 rounded-full transition-all duration-1000"
+                    className="bg-white h-3 rounded-full transition-all duration-1000"
                     style={{ width: contadorSegundos === 2 ? '50%' : '100%' }}
                   />
                 </div>
-                <span className="text-white font-bold text-sm">{contadorSegundos}s</span>
+                <span className="text-white font-bold text-base">{contadorSegundos}s</span>
               </div>
             )}
           </div>
 
+          {/* Cámara + panel de feedback */}
           <div className="flex gap-3 mb-4">
             <div
-              className="flex-1 bg-gray-900 rounded-2xl overflow-hidden"
-              style={{ height: '180px', position: 'relative' }}
+              className="flex-1 bg-gray-900 rounded-2xl overflow-hidden shadow-lg"
+              style={{ height: '210px', position: 'relative' }}
             >
               <video
                 ref={videoRef}
                 autoPlay playsInline muted
-                style={{ width: '100%', height: '180px', objectFit: 'contain', display: 'block', background: '#1a1a1a' }}
+                style={{ width: '100%', height: '210px', objectFit: 'contain', display: 'block', background: '#1a1a1a' }}
               />
               <canvas
                 ref={canvasRef}
@@ -305,31 +316,35 @@ export default function Camara({ modo = 'letras' }) {
               />
               {!cameraActiva && (
                 <div
-                  className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer"
+                  className="absolute inset-0 flex flex-col items-center justify-center cursor-pointer bg-gray-900 bg-opacity-90"
                   onClick={activarCamara}
                 >
-                  <span className="text-4xl mb-2">📷</span>
-                  <p className="text-sm text-gray-300">Toca para activar</p>
+                  <span className="text-5xl mb-3">📷</span>
+                  <p className="text-base text-gray-300 font-semibold">Toca para activar</p>
                 </div>
               )}
             </div>
 
-            <div className={`w-32 rounded-2xl flex flex-col items-center justify-center border-2 transition-all ${
-              feedback === 'correcto' ? 'bg-teal-100 border-teal-400'
+            {/* Panel detectado */}
+            <div className={`w-36 rounded-2xl flex flex-col items-center justify-center border-2 transition-all shadow-md ${
+              feedback === 'correcto' ? 'bg-teal-50 border-teal-400'
               : feedback === 'incorrecto' ? 'bg-amber-50 border-amber-300'
               : 'bg-white border-gray-200'
             }`}>
-              <p className="font-extrabold leading-none mb-1" style={{
-                fontSize: letraDetectada && letraDetectada.length > 1 ? '2.5rem' : '4rem',
-                color: feedback === 'correcto' ? '#0F6E56'
-                  : feedback === 'incorrecto' ? '#B45309' : '#C4B5FD'
-              }}>
+              <p
+                className="font-extrabold leading-none mb-1"
+                style={{
+                  fontSize: letraDetectada && letraDetectada.length > 1 ? '3rem' : '5rem',
+                  color: feedback === 'correcto' ? '#0F6E56'
+                    : feedback === 'incorrecto' ? '#B45309' : '#C4B5FD'
+                }}
+              >
                 {letraDetectada || '?'}
               </p>
               {!modoLibre && feedback === 'correcto' && contadorSegundos && (
-                <p className="text-lg font-bold text-teal-600">{contadorSegundos}s</p>
+                <p className="text-xl font-extrabold text-teal-600">{contadorSegundos}s</p>
               )}
-              <p className={`text-xs font-medium text-center px-1 ${
+              <p className={`text-sm font-bold text-center px-1 ${
                 feedback === 'correcto' ? 'text-teal-600'
                 : feedback === 'incorrecto' ? 'text-amber-600'
                 : 'text-gray-400'
@@ -339,128 +354,175 @@ export default function Camara({ modo = 'letras' }) {
                   : 'Detectado'}
               </p>
               {mensaje && (
-                <p className="text-xs text-amber-600 text-center px-2 mt-1">{mensaje}</p>
+                <p className="text-xs text-amber-600 text-center px-2 mt-1 font-semibold">{mensaje}</p>
               )}
             </div>
           </div>
 
+          {/* Navegación modo libre */}
           {modoLibre && (
             <div className="flex gap-3 mb-3">
               <button
                 onClick={letraAnterior}
                 disabled={indiceLetra === 0}
-                className="flex-1 border border-purple-300 text-purple-600 py-3 rounded-xl font-medium text-sm disabled:opacity-30"
+                className="flex-1 border-2 border-purple-300 text-purple-600 py-4 rounded-2xl font-bold text-base disabled:opacity-30 active:scale-95 transition-transform"
               >
                 ← Anterior
               </button>
               <button
                 onClick={siguienteLetra}
                 disabled={indiceLetra >= LETRAS.length - 1}
-                className="flex-1 border border-purple-300 text-purple-600 py-3 rounded-xl font-medium text-sm disabled:opacity-30"
+                className="flex-1 border-2 border-purple-300 text-purple-600 py-4 rounded-2xl font-bold text-base disabled:opacity-30 active:scale-95 transition-transform"
               >
                 Siguiente →
               </button>
             </div>
           )}
 
-          <div className="grid grid-cols-3 gap-3 mb-3">
-            <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
-              <p className="text-xl font-bold text-gray-800">{aciertos}</p>
-              <p className="text-xs text-gray-400">Aciertos</p>
+          {/* Estadísticas */}
+          <div className="grid grid-cols-3 gap-3 mb-4">
+            <div className="bg-white rounded-2xl p-3 text-center border-2 border-gray-100 shadow-sm">
+              <p className="text-3xl font-extrabold text-gray-800">{aciertos}</p>
+              <p className="text-xs font-bold text-gray-400 mt-0.5">Aciertos</p>
             </div>
-            <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
-              <p className="text-xl font-bold text-gray-800">{racha}</p>
-              <p className="text-xs text-gray-400">Racha</p>
+            <div className="bg-white rounded-2xl p-3 text-center border-2 border-gray-100 shadow-sm">
+              <p className="text-3xl font-extrabold text-gray-800">{racha}</p>
+              <p className="text-xs font-bold text-gray-400 mt-0.5">Racha 🔥</p>
             </div>
-            <div className="bg-white rounded-xl p-3 text-center border border-gray-100">
-              <p className="text-xl font-bold text-gray-800">
+            <div className="bg-white rounded-2xl p-3 text-center border-2 border-gray-100 shadow-sm">
+              <p className="text-2xl font-bold text-gray-800">
                 {'⭐'.repeat(estrellas)}{'☆'.repeat(3 - estrellas)}
               </p>
-              <p className="text-xs text-gray-400">Estrellas</p>
+              <p className="text-xs font-bold text-gray-400 mt-0.5">Estrellas</p>
             </div>
           </div>
 
+          {/* Botón cámara */}
           {!cameraActiva ? (
-            <button onClick={activarCamara} className="w-full bg-purple-600 text-white py-3 rounded-xl font-medium text-sm mb-3">
+            <button
+              onClick={activarCamara}
+              className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-base mb-3 shadow-md active:scale-95 transition-transform hover:bg-purple-700"
+            >
               📷 Activar cámara
             </button>
           ) : (
-            <button onClick={detenerCamara} className="w-full bg-red-100 text-red-600 border border-red-200 py-3 rounded-xl font-medium text-sm mb-3">
+            <button
+              onClick={detenerCamara}
+              className="w-full bg-red-50 text-red-600 border-2 border-red-200 py-4 rounded-2xl font-bold text-base mb-3 active:scale-95 transition-transform"
+            >
               ⏹ Detener cámara
             </button>
           )}
 
+          {/* Saltar */}
           {!modoLibre && (
-            <button onClick={siguienteLetra} className="w-full border border-purple-300 text-purple-600 py-3 rounded-xl font-medium text-sm">
+            <button
+              onClick={siguienteLetra}
+              className="w-full border-2 border-purple-200 text-purple-600 py-3.5 rounded-2xl font-bold text-base active:scale-95 transition-transform hover:bg-purple-50"
+            >
               Saltar → {LETRAS[indiceLetra + 1] || 'Finalizar'}
             </button>
           )}
         </div>
       </div>
 
-      {/* Pantalla celebración */}
+      {/* ── Pantalla celebración ──────────────────────────────── */}
       {pantalla === 'celebracion' && (
-        <div className="min-h-screen bg-teal-50 flex flex-col items-center justify-center p-6 text-center">
-          <div className="text-7xl mb-4 animate-bounce">🎉</div>
-          <h2 className="text-3xl font-extrabold text-teal-700 mb-2">
-            ¡{esNumeros ? 'Número' : 'Letra'} {letra} completada!
-          </h2>
-          <div className="flex gap-1 mb-8">
-            {'⭐'.repeat(estrellas).split('').map((s, i) => (
-              <span key={i} className="text-3xl">{s}</span>
+        <div className="min-h-screen bg-gradient-to-b from-teal-400 to-teal-600 flex flex-col items-center justify-center p-6 text-center">
+          <div className="text-8xl mb-2 animate-celebrate">🎉</div>
+          <div className="text-5xl mb-6 animate-bounce">🥳</div>
+
+          <div className="bg-white bg-opacity-20 rounded-3xl px-8 py-5 mb-6 backdrop-blur-sm border border-white border-opacity-30">
+            <p className="text-white text-lg font-bold mb-1">¡Completaste la seña!</p>
+            <p
+              className="font-extrabold text-white leading-none"
+              style={{ fontSize: '5rem' }}
+            >
+              {letra}
+            </p>
+          </div>
+
+          <div className="flex gap-2 mb-8">
+            {Array.from({ length: 3 }).map((_, i) => (
+              <span
+                key={i}
+                className="text-4xl animate-star-pop"
+                style={{ animationDelay: `${i * 120}ms` }}
+              >
+                {i < estrellas ? '⭐' : '☆'}
+              </span>
             ))}
           </div>
+
           <div className="w-full max-w-xs flex flex-col gap-3">
             {indiceLetra + 1 < LETRAS.length ? (
               <button
                 onClick={siguienteLetra}
-                className="w-full bg-teal-600 text-white py-4 rounded-2xl font-bold text-lg"
+                className="w-full bg-white text-teal-700 py-5 rounded-2xl font-extrabold text-xl shadow-xl active:scale-95 transition-transform"
               >
                 Siguiente: {LETRAS[indiceLetra + 1]} →
               </button>
             ) : (
               <button
                 onClick={() => setPantalla('final')}
-                className="w-full bg-teal-600 text-white py-4 rounded-2xl font-bold text-lg"
+                className="w-full bg-white text-teal-700 py-5 rounded-2xl font-extrabold text-xl shadow-xl active:scale-95 transition-transform"
               >
                 ¡Ver mis resultados! 🏆
               </button>
             )}
             <button
-              onClick={() => { setFeedback(null); setLetraDetectada(null); setBloqueado(false); bloqueadoRef.current = false; deteccionEstableRef.current = null; setContadorSegundos(null); setPantalla('practica') }}
-              className="w-full border border-teal-400 text-teal-600 py-3 rounded-2xl font-medium"
+              onClick={() => {
+                setFeedback(null)
+                setLetraDetectada(null)
+                setBloqueado(false)
+                bloqueadoRef.current = false
+                deteccionEstableRef.current = null
+                setContadorSegundos(null)
+                setPantalla('practica')
+              }}
+              className="w-full bg-white bg-opacity-20 border-2 border-white border-opacity-50 text-white py-4 rounded-2xl font-bold text-base"
             >
               Repetir {letra}
             </button>
-            <button onClick={volverAtras} className="text-sm text-gray-400 mt-1">
+            <button
+              onClick={volverAtras}
+              className="text-base text-white text-opacity-70 mt-1 font-medium"
+            >
               ← Volver al módulo
             </button>
           </div>
         </div>
       )}
 
-      {/* Pantalla final */}
+      {/* ── Pantalla final ────────────────────────────────────── */}
       {pantalla === 'final' && (
-        <div className="min-h-screen bg-purple-50 flex flex-col items-center justify-center p-6 text-center">
-          <div className="text-7xl mb-4">🏆</div>
-          <h2 className="text-3xl font-extrabold text-purple-700 mb-2">¡Sesión completada!</h2>
-          <p className="text-purple-500 mb-6">Completaste {aciertos} {esNumeros ? 'números' : 'letras'}</p>
-          <div className="grid grid-cols-3 gap-4 w-full max-w-xs mb-8">
-            <div className="bg-white rounded-2xl p-4 border border-purple-100 text-center">
-              <p className="text-2xl font-bold text-purple-700">{aciertos}</p>
-              <p className="text-xs text-gray-400">Completadas</p>
+        <div className="min-h-screen bg-gradient-to-b from-purple-600 to-purple-800 flex flex-col items-center justify-center p-6 text-center">
+          <div className="text-8xl mb-3 animate-celebrate">🏆</div>
+          <h2 className="text-4xl font-extrabold text-white mb-2">¡Sesión completada!</h2>
+          <p className="text-purple-200 text-lg mb-8 font-semibold">
+            Completaste {aciertos} {esNumeros ? 'números' : 'letras'}
+          </p>
+
+          <div className="grid grid-cols-3 gap-4 w-full max-w-xs mb-10">
+            <div className="bg-white bg-opacity-20 rounded-2xl p-4 border border-white border-opacity-20 text-center">
+              <p className="text-3xl font-extrabold text-white">{aciertos}</p>
+              <p className="text-xs text-purple-200 mt-1 font-bold">Completadas</p>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-purple-100 text-center">
-              <p className="text-2xl font-bold text-purple-700">{racha}</p>
-              <p className="text-xs text-gray-400">Mejor racha</p>
+            <div className="bg-white bg-opacity-20 rounded-2xl p-4 border border-white border-opacity-20 text-center">
+              <p className="text-3xl font-extrabold text-white">{racha}</p>
+              <p className="text-xs text-purple-200 mt-1 font-bold">Mejor racha</p>
             </div>
-            <div className="bg-white rounded-2xl p-4 border border-purple-100 text-center">
-              <p className="text-xl font-bold text-purple-700">{'⭐'.repeat(Math.min(estrellas, 3))}</p>
-              <p className="text-xs text-gray-400">Estrellas</p>
+            <div className="bg-white bg-opacity-20 rounded-2xl p-4 border border-white border-opacity-20 text-center">
+              <p className="text-xl font-bold text-white">{'⭐'.repeat(Math.min(estrellas, 3))}</p>
+              <p className="text-xs text-purple-200 mt-1 font-bold">Estrellas</p>
             </div>
           </div>
+
           <div className="w-full max-w-xs flex flex-col gap-3">
-            <button onClick={() => navigate('/')} className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg">
+            <button
+              onClick={() => navigate('/')}
+              className="w-full bg-white text-purple-700 py-5 rounded-2xl font-extrabold text-xl shadow-xl active:scale-95 transition-transform"
+            >
               🏠 Ir al inicio
             </button>
             <button
@@ -474,7 +536,7 @@ export default function Camara({ modo = 'letras' }) {
                 setContadorSegundos(null)
                 setPantalla('practica')
               }}
-              className="w-full border border-purple-400 text-purple-600 py-3 rounded-2xl font-medium"
+              className="w-full bg-white bg-opacity-20 border-2 border-white border-opacity-40 text-white py-4 rounded-2xl font-bold text-base"
             >
               Volver a intentar
             </button>

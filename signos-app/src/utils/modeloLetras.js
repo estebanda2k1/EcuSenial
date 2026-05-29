@@ -1,6 +1,7 @@
 import * as tf from '@tensorflow/tfjs'
 
-let modelo = null
+// Un objeto por modelo en vez de una variable global única
+const modelos = { letras: null, numeros: null }
 
 // Convierte los 21 landmarks en un array de 63 números (x,y,z por punto)
 export function landmarksAVector(landmarks) {
@@ -25,17 +26,16 @@ export function normalizar(vector) {
       vector[i + 2] - baseZ,
     )
   }
-  // Escalar para que el mayor valor sea 1
   const max = Math.max(...normalizado.map(Math.abs))
   return normalizado.map(v => v / (max || 1))
 }
 
-export function crearModelo(numLetras) {
+export function crearModelo(numClases) {
   const m = tf.sequential()
   m.add(tf.layers.dense({ inputShape: [63], units: 128, activation: 'relu' }))
   m.add(tf.layers.dropout({ rate: 0.3 }))
   m.add(tf.layers.dense({ units: 64, activation: 'relu' }))
-  m.add(tf.layers.dense({ units: numLetras, activation: 'softmax' }))
+  m.add(tf.layers.dense({ units: numClases, activation: 'softmax' }))
   m.compile({
     optimizer: 'adam',
     loss: 'categoricalCrossentropy',
@@ -44,8 +44,9 @@ export function crearModelo(numLetras) {
   return m
 }
 
-export async function entrenarModelo(datos, etiquetas, letras) {
-  const m = crearModelo(letras.length)
+// tipo: 'letras' | 'numeros'
+export async function entrenarModelo(datos, etiquetas, clases, tipo = 'letras') {
+  const m = crearModelo(clases.length)
   const xs = tf.tensor2d(datos)
   const ys = tf.tensor2d(etiquetas)
   await m.fit(xs, ys, {
@@ -54,55 +55,62 @@ export async function entrenarModelo(datos, etiquetas, letras) {
     validationSplit: 0.2,
     callbacks: {
       onEpochEnd: (epoch, logs) => {
-        console.log(`Época ${epoch + 1}: precisión=${(logs.acc * 100).toFixed(1)}%`)
+        console.log(`[${tipo}] Época ${epoch + 1}: precisión=${(logs.acc * 100).toFixed(1)}%`)
       }
     }
   })
-  modelo = m
+  modelos[tipo] = m
   xs.dispose()
   ys.dispose()
   return m
 }
 
-export async function predecir(landmarks, letras) {
-  if (!modelo) return null
+// tipo: 'letras' | 'numeros' — clases debe coincidir con las usadas al entrenar
+export async function predecir(landmarks, clases, tipo = 'letras') {
+  const m = modelos[tipo]
+  if (!m) return null
   const vector = normalizar(landmarksAVector(landmarks))
   const tensor = tf.tensor2d([vector])
-  const pred = modelo.predict(tensor)
+  const pred = m.predict(tensor)
   const data = await pred.data()
   tensor.dispose()
   pred.dispose()
   const maxIdx = data.indexOf(Math.max(...data))
   const confianza = data[maxIdx]
   if (confianza < 0.7) return null
-  return letras[maxIdx]
+  return clases[maxIdx]
 }
 
-export async function guardarModelo() {
-  if (!modelo) return
-  await modelo.save('localstorage://signos-modelo')
+export async function guardarModelo(tipo = 'letras') {
+  const m = modelos[tipo]
+  if (!m) return
+  await m.save(`localstorage://signos-modelo-${tipo}`)
 }
 
-export async function cargarModelo() {
+export async function cargarModelo(tipo = 'letras') {
   try {
-    // Primero intenta cargar desde los archivos del proyecto
-    modelo = await tf.loadLayersModel('/src/assets/modelo/signos-modelo.json')
-    console.log('Modelo cargado desde archivos')
+    // Intenta desde los archivos del proyecto (pre-entrenado)
+    const url = tipo === 'letras'
+      ? '/src/assets/modelo/signos-modelo.json'
+      : '/src/assets/modelo/signos-modelo-numeros.json'
+    modelos[tipo] = await tf.loadLayersModel(url)
+    console.log(`Modelo ${tipo} cargado desde archivos`)
     return true
   } catch {
     try {
-      // Si no encuentra los archivos, intenta localStorage
-      modelo = await tf.loadLayersModel('localstorage://signos-modelo')
-      console.log('Modelo cargado desde localStorage')
+      // Carga el modelo entrenado por el usuario desde localStorage
+      modelos[tipo] = await tf.loadLayersModel(`localstorage://signos-modelo-${tipo}`)
+      console.log(`Modelo ${tipo} cargado desde localStorage`)
       return true
     } catch {
-      console.log('No hay modelo guardado')
+      console.log(`No hay modelo ${tipo} disponible`)
       return false
     }
   }
 }
 
-export async function exportarModelo() {
-  if (!modelo) return
-  await modelo.save('downloads://signos-modelo')
+export async function exportarModelo(tipo = 'letras') {
+  const m = modelos[tipo]
+  if (!m) return
+  await m.save(`downloads://signos-modelo-${tipo}`)
 }

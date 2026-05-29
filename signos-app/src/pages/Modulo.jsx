@@ -41,76 +41,97 @@ export default function Modulo({ modo = 'letras' }) {
   const [seleccionada, setSeleccionada] = useState(items[0])
   const rutaCamara = esNumeros ? '/camara-numeros' : '/camara'
 
+  const hechas = items.filter(i => i.hecho).length
+
   return (
     <div className="min-h-screen bg-purple-50 p-4">
 
       {/* Header */}
-      <div className="flex items-center justify-between mb-4">
-        <button onClick={() => navigate('/')} className="text-purple-600 font-medium text-sm">
+      <div className="flex items-center justify-between mb-5">
+        <button
+          onClick={() => navigate('/')}
+          className="flex items-center gap-1 text-purple-600 font-bold text-base active:scale-95 transition-transform"
+        >
           ← Inicio
         </button>
-        <span className="font-medium text-gray-700">{esNumeros ? 'Números' : 'Alfabeto'}</span>
-        <span className="text-xs bg-purple-100 text-purple-700 px-2 py-1 rounded-full">
-          {items.filter(i => i.hecho).length}/{items.length}
+        <span className="font-extrabold text-gray-700 text-lg">
+          {esNumeros ? '🔢 Números' : '🔤 Alfabeto'}
+        </span>
+        <span className="text-sm bg-purple-100 text-purple-700 px-3 py-1.5 rounded-full font-bold">
+          {hechas}/{items.length} ✅
         </span>
       </div>
 
-      {/* Grilla de letras */}
-      <div className="grid grid-cols-6 gap-2 mb-5">
+      {/* Barra de progreso */}
+      {hechas > 0 && (
+        <div className="w-full bg-purple-100 rounded-full h-3 mb-5">
+          <div
+            className="bg-purple-500 h-3 rounded-full transition-all"
+            style={{ width: `${(hechas / items.length) * 100}%` }}
+          />
+        </div>
+      )}
+
+      {/* Grilla de letras — 5 columnas para botones más grandes */}
+      <div className="grid grid-cols-5 gap-2.5 mb-5">
         {items.map((item) => (
           <button
             key={item.letra}
             onClick={() => setSeleccionada(item)}
-            className={`rounded-xl py-2 text-base font-bold border transition-all
-              ${item.hecho
-                ? 'bg-teal-100 border-teal-300 text-teal-700'
+            className={`rounded-2xl py-3 text-lg font-extrabold border-2 transition-all active:scale-95 ${
+              item.hecho
+                ? 'bg-teal-100 border-teal-400 text-teal-700 shadow-sm'
                 : seleccionada.letra === item.letra
-                  ? 'bg-purple-200 border-purple-500 text-purple-800'
-                  : 'bg-white border-gray-200 text-gray-700'
-              }`}
+                  ? 'bg-purple-600 border-purple-700 text-white shadow-lg scale-105'
+                  : 'bg-white border-gray-200 text-gray-700 hover:border-purple-300 hover:bg-purple-50'
+            }`}
           >
-            {item.letra}
+            {item.hecho ? '✓' : item.letra}
           </button>
         ))}
       </div>
 
       {/* Panel de letra seleccionada */}
-      <div className="bg-purple-100 border border-purple-300 rounded-2xl p-5 flex gap-4 items-center mb-5">
-        <div className="w-20 h-20 bg-purple-600 rounded-xl flex items-center justify-center flex-shrink-0">
-          <span className="text-4xl font-bold text-white">{seleccionada.letra}</span>
-        </div>
-        <div className="flex-1">
-          <p className="font-semibold text-purple-800 mb-1">
-            {esNumeros ? 'Número' : 'Letra'} {seleccionada.letra}
-          </p>
-          <p className="text-sm text-purple-600 mb-3">{seleccionada.descripcion}</p>
-          <button
-            onClick={() => navigate(rutaCamara, { state: { letra: seleccionada.letra } })}
-            className="bg-purple-600 text-white text-sm px-4 py-2 rounded-lg"
-          >
-            📷 Practicar
-          </button>
+      <div className="bg-gradient-to-br from-purple-600 to-purple-700 rounded-3xl p-5 mb-5 shadow-xl animate-slide-up">
+        <div className="flex gap-4 items-center">
+          <div className="w-24 h-24 bg-white bg-opacity-20 rounded-2xl flex items-center justify-center flex-shrink-0 border-2 border-white border-opacity-30">
+            <span className="text-5xl font-extrabold text-white">{seleccionada.letra}</span>
+          </div>
+          <div className="flex-1">
+            <p className="font-extrabold text-white text-xl mb-1">
+              {esNumeros ? 'Número' : 'Letra'} {seleccionada.letra}
+            </p>
+            <p className="text-purple-200 text-sm mb-4 leading-relaxed">
+              {seleccionada.descripcion}
+            </p>
+            <button
+              onClick={() => navigate(rutaCamara, { state: { letra: seleccionada.letra } })}
+              className="bg-white text-purple-700 text-base px-5 py-2.5 rounded-xl font-bold shadow-md active:scale-95 transition-transform"
+            >
+              📷 Practicar
+            </button>
+          </div>
         </div>
       </div>
 
       {/* Sección práctica libre */}
-      <div className="bg-white border border-purple-200 rounded-2xl p-5">
+      <div className="bg-white border-2 border-purple-200 rounded-3xl p-5 shadow-sm">
         <div className="flex items-center gap-3 mb-3">
-          <div className="w-10 h-10 bg-purple-100 rounded-xl flex items-center justify-center">
-            <span className="text-xl">🆓</span>
+          <div className="w-12 h-12 bg-purple-100 rounded-2xl flex items-center justify-center">
+            <span className="text-2xl">🆓</span>
           </div>
           <div>
-            <p className="font-semibold text-gray-800">Práctica libre</p>
-            <p className="text-xs text-gray-400">Practica todas las {esNumeros ? 'números' : 'letras'} sin límite</p>
+            <p className="font-bold text-gray-800 text-lg">Práctica libre</p>
+            <p className="text-sm text-gray-400">Sin presión, a tu ritmo</p>
           </div>
         </div>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 mb-4 leading-relaxed">
           Navega entre {esNumeros ? 'los números' : 'las letras'} libremente con la cámara activa.
           Sin presión, sin celebraciones — solo practica a tu ritmo.
         </p>
         <button
           onClick={() => navigate(rutaCamara, { state: { letra: items[0].letra, libre: true } })}
-          className="w-full bg-purple-600 text-white py-3 rounded-xl font-semibold text-sm"
+          className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-base shadow-md active:scale-95 transition-transform hover:bg-purple-700"
         >
           🆓 Entrar a práctica libre
         </button>

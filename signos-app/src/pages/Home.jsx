@@ -1,102 +1,107 @@
 import { useNavigate } from 'react-router-dom'
 import { exportarModelo, cargarModelo } from '../utils/modeloLetras'
 
-
 export default function Home() {
   const navigate = useNavigate()
+
   async function descargarModelo() {
-  const ok = await cargarModelo()
-  if (ok) {
-    await exportarModelo()
-  } else {
-    alert('No hay modelo guardado, debes entrenar primero')
+    const ok = await cargarModelo()
+    if (ok) {
+      await exportarModelo()
+    } else {
+      alert('No hay modelo guardado, debes entrenar primero')
+    }
   }
-}
+
   return (
-    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#FFF7ED,#F3E8FF_55%,#EDE9FE)] px-6 py-10">
-      <div className="max-w-3xl mx-auto">
-        <div className="flex flex-col items-center text-center mb-10 animate-fade-up">
-          <div className="relative">
-            <div className="w-24 h-24 bg-purple-600 rounded-[28px] flex items-center justify-center shadow-lg">
-              <span className="text-4xl">🤟</span>
+    <div className="min-h-screen bg-[radial-gradient(circle_at_top,#FFF7ED,#F3E8FF_55%,#EDE9FE)] px-5 py-8">
+      <div className="max-w-sm mx-auto flex flex-col gap-5">
+
+        {/* Hero */}
+        <div className="flex flex-col items-center text-center animate-fade-up">
+          <div className="relative mb-3">
+            <div className="w-28 h-28 bg-gradient-to-br from-purple-500 to-purple-700 rounded-[32px] flex items-center justify-center shadow-2xl animate-float">
+              <span className="text-5xl">🤟</span>
             </div>
-            <div className="absolute -top-2 -right-2 w-8 h-8 bg-amber-300 rounded-full animate-bounce"></div>
+            <div className="absolute -top-2 -right-2 w-10 h-10 bg-amber-300 rounded-full animate-bounce flex items-center justify-center text-xl shadow-md">
+              ✨
+            </div>
           </div>
-          <h1 className="text-4xl sm:text-5xl font-extrabold text-purple-700 mt-5">SignosApp</h1>
-          <p className="text-purple-600 mt-2 text-base sm:text-lg">
-            Un lugar divertido para aprender lenguaje de señas
+          <h1 className="text-5xl font-extrabold text-purple-700 mt-3 tracking-tight">EcuSenial</h1>
+          <p className="text-purple-500 mt-2 text-lg font-semibold">
+            Aprende señas ecuatorianas
           </p>
-          <span className="mt-3 text-xs sm:text-sm bg-purple-100 text-purple-700 px-3 py-1 rounded-full">
-            Para ninos de 5 a 15 anos
+          <span className="mt-3 text-sm bg-purple-100 text-purple-700 px-4 py-2 rounded-full font-bold shadow-sm">
+            Para niños de 5 a 15 años 🌟
           </span>
         </div>
 
-        <div className="grid gap-5 sm:grid-cols-2">
-          <div className="bg-white border border-purple-200 rounded-3xl p-6 shadow-sm animate-fade-up">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-purple-100 rounded-2xl flex items-center justify-center">
-                <span className="text-2xl">🔤</span>
-              </div>
-              <div>
-                <p className="text-lg font-bold text-gray-800">Aprender letras</p>
-                <p className="text-sm text-gray-500">Reconoce el abecedario A-Z</p>
-              </div>
+        {/* Aprender letras */}
+        <div className="bg-white border-2 border-purple-200 rounded-3xl p-6 shadow-lg animate-fade-up">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <span className="text-3xl">🔤</span>
             </div>
-            <button
-              onClick={() => navigate('/modulo')}
-              className="mt-5 w-full bg-purple-600 text-white py-3 rounded-2xl font-semibold text-sm transition-transform hover:-translate-y-0.5"
-            >
-              Empezar
-            </button>
-          </div>
-
-          <div className="bg-white border border-gray-200 rounded-3xl p-6 opacity-70 animate-fade-up-delay">
-            <div className="flex items-center gap-4">
-              <div className="w-14 h-14 bg-amber-100 rounded-2xl flex items-center justify-center">
-                <span className="text-2xl">🔢</span>
-              </div>
-              <div>
-                <p className="text-lg font-bold text-gray-800">Aprender numeros</p>
-                <p className="text-sm text-gray-500">Aprende los numeros del 1 al 10</p>
-              </div>
-            </div>
-            <div className="mt-5 text-xs text-amber-700 bg-amber-100 px-3 py-2 rounded-xl text-center">
-              <button onClick={() => navigate('/modulo-numeros')}>
-                Empieza Aqui
-              </button>
+            <div>
+              <p className="text-xl font-extrabold text-gray-800">Aprender letras</p>
+              <p className="text-sm text-gray-500 mt-0.5">Señas del alfabeto A – Z</p>
             </div>
           </div>
+          <button
+            onClick={() => navigate('/modulo')}
+            className="w-full bg-purple-600 text-white py-4 rounded-2xl font-bold text-lg shadow-md transition-transform active:scale-95 hover:-translate-y-0.5 hover:bg-purple-700"
+          >
+            Empezar
+          </button>
         </div>
 
-        <div className="mt-8 bg-white/70 border border-white rounded-3xl p-5 text-center animate-fade-up-delay">
-          <p className="text-sm text-gray-600">Aprende jugando, paso a paso, con retos cortos y faciles.</p>
-        </div>
-      </div>
-      <button
-        onClick={descargarModelo}
-        className="w-full max-w-sm mt-4 bg-teal-600 text-white py-3 rounded-xl font-medium text-sm"
-      >
-        ⬇️ Exportar modelo entrenado
-      </button>
-      <div className="bg-white border border-purple-200 rounded-3xl p-6 shadow-sm col-span-2">
-        <div className="flex items-center gap-4">
-          <div className="w-14 h-14 bg-red-100 rounded-2xl flex items-center justify-center">
-            <span className="text-2xl">🎯</span>
+        {/* Aprender números */}
+        <div className="bg-white border-2 border-amber-200 rounded-3xl p-6 shadow-lg animate-fade-up-delay">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-16 h-16 bg-amber-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <span className="text-3xl">🔢</span>
+            </div>
+            <div>
+              <p className="text-xl font-extrabold text-gray-800">Aprender números</p>
+              <p className="text-sm text-gray-500 mt-0.5">Señas del 1 al 10</p>
+            </div>
           </div>
-          <div>
-            <p className="text-lg font-bold text-gray-800">Modo desafío</p>
-            <p className="text-sm text-gray-500">Señas al azar — pon a prueba lo que aprendiste</p>
-          </div>
+          <button
+            onClick={() => navigate('/modulo-numeros')}
+            className="w-full bg-amber-500 text-white py-4 rounded-2xl font-bold text-lg shadow-md transition-transform active:scale-95 hover:-translate-y-0.5 hover:bg-amber-600"
+          >
+            Empezar
+          </button>
         </div>
+
+        {/* Modo desafío */}
+        <div className="bg-white border-2 border-red-200 rounded-3xl p-6 shadow-lg animate-fade-up-delay">
+          <div className="flex items-center gap-4 mb-5">
+            <div className="w-16 h-16 bg-red-100 rounded-2xl flex items-center justify-center flex-shrink-0">
+              <span className="text-3xl">🎯</span>
+            </div>
+            <div>
+              <p className="text-xl font-extrabold text-gray-800">Modo desafío</p>
+              <p className="text-sm text-gray-500 mt-0.5">Señas al azar — pon a prueba lo que aprendiste</p>
+            </div>
+          </div>
+          <button
+            onClick={() => navigate('/desafio')}
+            className="w-full bg-red-500 text-white py-4 rounded-2xl font-bold text-lg shadow-md transition-transform active:scale-95 hover:-translate-y-0.5 hover:bg-red-600"
+          >
+            🎯 Jugar
+          </button>
+        </div>
+
+        {/* Exportar modelo */}
         <button
-          onClick={() => navigate('/desafio')}
-          className="mt-5 w-full bg-red-500 text-white py-3 rounded-2xl font-semibold text-sm"
+          onClick={descargarModelo}
+          className="w-full bg-teal-50 border-2 border-teal-200 text-teal-700 py-3.5 rounded-2xl font-semibold text-sm hover:bg-teal-100 transition-colors"
         >
-          🎯 Jugar
+          ⬇️ Exportar modelo entrenado
         </button>
+
       </div>
     </div>
-
-    
   )
 }
