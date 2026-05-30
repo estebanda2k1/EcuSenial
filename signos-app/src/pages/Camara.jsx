@@ -48,8 +48,11 @@ export default function Camara({ modo = 'letras' }) {
     const tipo = esNumeros ? 'numeros' : 'letras'
     cargarModelo(tipo).then(ok => {
       modeloCargadoRef.current = ok
+      if (!ok) { 
+        console.warn('No se pudo cargar el modelo de ' + tipo + '. El reconocimiento será menos preciso.')
+      }
     })
-  }, [])
+  }, [esNumeros])
 
   useEffect(() => {
     letraRef.current = letra

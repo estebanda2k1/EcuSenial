@@ -69,6 +69,18 @@ export async function entrenarModelo(datos, etiquetas, clases, tipo = 'letras') 
 export async function predecir(landmarks, clases, tipo = 'letras') {
   const m = modelos[tipo]
   if (!m) return null
+
+  // Verificar que el número de clases coincide con la salida del modelo
+  const outputShape = m.outputShape
+  const numClasesModelo = Array.isArray(outputShape) 
+    ? outputShape[outputShape.length - 1] 
+    : outputShape
+  
+  if (numClasesModelo !== clases.length) {
+    console.warn(`Modelo ${tipo} espera ${numClasesModelo} clases pero recibió ${clases.length}`)
+    return null
+  }
+  
   const vector = normalizar(landmarksAVector(landmarks))
   const tensor = tf.tensor2d([vector])
   const pred = m.predict(tensor)
@@ -104,6 +116,7 @@ export async function cargarModelo(tipo = 'letras') {
       return true
     } catch {
       console.log(`No hay modelo ${tipo} disponible`)
+      modelos[tipo] = null
       return false
     }
   }
