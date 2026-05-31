@@ -145,6 +145,12 @@ export default function Camara({ modo = 'letras' }) {
             setAciertos(prev => prev + 1)
             setRacha(prev => prev + 1)
             setEstrellas(prev => Math.min(prev + 1, 3))
+            // Persistir letra aprendida en localStorage para que Modulo la muestre en verde
+            const _clave = `ecusenial-aprendidas-${esNumeros ? 'numeros' : 'letras'}`
+            const _prev = JSON.parse(localStorage.getItem(_clave) || '[]')
+            if (!_prev.includes(letraRef.current)) {
+              localStorage.setItem(_clave, JSON.stringify([..._prev, letraRef.current]))
+            }
             setTimeout(() => {
               pantallaRef.current = 'celebracion'
               setPantalla('celebracion')
@@ -270,33 +276,47 @@ export default function Camara({ modo = 'letras' }) {
             </div>
           )}
 
-          {/* Tarjeta de la letra objetivo */}
-          <div className={`rounded-3xl px-6 py-7 mb-4 text-center transition-all shadow-lg ${
-            animacion === 'exito' ? 'bg-teal-500' : 'bg-purple-600'
-          }`}>
-            <p className="text-base text-purple-200 mb-1 font-semibold">
-              {modoLibre ? 'Practica esta seña' : 'Haz esta seña'}
-            </p>
-            <p
-              className="font-extrabold text-white leading-none"
-              style={{ fontSize: '7.5rem' }}
-            >
-              {letra}
-            </p>
-            <p className="text-purple-200 text-sm mt-2 font-medium">
-              {esNumeros ? `Número ${letra}` : `Letra ${letra}`}
-            </p>
-            {contadorSegundos && (
-              <div className="mt-4 flex items-center justify-center gap-3">
-                <div className="w-full bg-white bg-opacity-30 rounded-full h-3 max-w-xs">
-                  <div
-                    className="bg-white h-3 rounded-full transition-all duration-1000"
-                    style={{ width: contadorSegundos === 2 ? '50%' : '100%' }}
-                  />
+          {/* Tarjeta de la letra objetivo + imagen de referencia */}
+          <div className="flex gap-3 mb-4 items-stretch">
+            <div className={`flex-1 rounded-3xl px-4 py-5 text-center transition-all shadow-lg ${
+              animacion === 'exito' ? 'bg-teal-500' : 'bg-purple-600'
+            }`}>
+              <p className="text-xs text-purple-200 mb-1 font-semibold">
+                {modoLibre ? 'Practica esta seña' : 'Haz esta seña'}
+              </p>
+              <p
+                className="font-extrabold text-white leading-none"
+                style={{ fontSize: '5.5rem' }}
+              >
+                {letra}
+              </p>
+              <p className="text-purple-200 text-xs mt-1 font-medium">
+                {esNumeros ? `Número ${letra}` : `Letra ${letra}`}
+              </p>
+              {contadorSegundos && (
+                <div className="mt-3 flex items-center justify-center gap-2">
+                  <div className="w-full bg-white bg-opacity-30 rounded-full h-2 max-w-xs">
+                    <div
+                      className="bg-white h-2 rounded-full transition-all duration-1000"
+                      style={{ width: contadorSegundos === 2 ? '50%' : '100%' }}
+                    />
+                  </div>
+                  <span className="text-white font-bold text-sm">{contadorSegundos}s</span>
                 </div>
-                <span className="text-white font-bold text-base">{contadorSegundos}s</span>
-              </div>
-            )}
+              )}
+            </div>
+
+            {/* Imagen de referencia de la seña */}
+            <div className="w-28 rounded-3xl bg-white shadow-lg border-2 border-purple-200 flex flex-col items-center justify-center p-2 gap-1">
+              <img
+                src={esNumeros ? `/numeros/${letra}.png` : `/letras/${letra.toLowerCase()}.png`}
+                alt={`Seña ${esNumeros ? 'número' : 'letra'} ${letra}`}
+                className="w-full object-contain"
+                style={{ maxHeight: '110px' }}
+                onError={(e) => { e.target.style.display = 'none' }}
+              />
+              <p className="text-xs font-bold text-purple-400">Referencia</p>
+            </div>
           </div>
 
           {/* Cámara + panel de feedback */}
